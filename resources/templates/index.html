@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco</title>
+    <link rel="stylesheet" href="estilos/style.css">
+</head>
+<body>
+
+<h1>Contas Bancárias</h1>
+
+<!-- Formulário para Criar Conta -->
+<h2>Criar Conta</h2>
+<form id="createForm">
+    <label for="numero">Número da Conta:</label>
+    <input type="text" id="numero" required><br><br>
+    <label for="saldo">Saldo Inicial:</label>
+    <input type="number" id="saldo" required><br><br>
+    <button type="submit">Criar Conta</button>
+</form>
+
+<h2>Contas Existentes</h2>
+<button onclick="listarContas()">Listar Contas</button>
+<ul id="contasList"></ul>
+
+<script>
+    // Função para criar conta
+    document.getElementById('createForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const numero = document.getElementById('numero').value;
+        const saldo = parseFloat(document.getElementById('saldo').value);
+
+        const data = {
+            numero: numero,
+            saldo: saldo
+        };
+
+        fetch('http://localhost:8080/api/contas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Conta criada:', data);
+        })
+        .catch((error) => {
+            console.error('Erro:', error);
+        });
+    });
+
+    // Função para listar contas
+    function listarContas() {
+        fetch('http://localhost:8080/api/contas')
+        .then(response => response.json())
+        .then(data => {
+            const contasList = document.getElementById('contasList');
+            contasList.innerHTML = ''; // Limpa a lista
+            data.forEach(conta => {
+                const li = document.createElement('li');
+                li.textContent = `Conta: ${conta.numero} | Saldo: R$ ${conta.saldo}`;
+                contasList.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Erro ao listar contas:', error));
+    }
+</script>
+
+</body>
+</html>
